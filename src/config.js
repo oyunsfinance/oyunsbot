@@ -11,7 +11,7 @@ export const CONFIG = {
   SHEET_ID: '1GW52bElP8qJVUxP_vLiqghRwOHHCxHLMzHEzTVfVSGw',
 
   // ③ Google Apps Script Web App URL
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxRdyMj4_-t8TB9ceTBgLJCUUE-j8KyXx3dS_fnSLGCqhRnk_L7sEaEKPuhYNOvUkKbSw/exec',
 
   // ④ Cache duration (milliseconds)
   CACHE_TTL: 5 * 60 * 1000, // 5 минут
