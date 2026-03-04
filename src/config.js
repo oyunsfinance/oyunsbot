@@ -5,7 +5,7 @@
 
 export const CONFIG = {
   // ① Cloudflare Worker URL (deploy хийсний дараа солино)
-  WORKER_URL: 'https://oyuns-proxy.YOUR-SUBDOMAIN.workers.dev',
+  WORKER_URL: 'https://odd-pond-a276.anujin4x.workers.dev/',
 
   // ② Google Sheets ID
   SHEET_ID: '1GW52bElP8qJVUxP_vLiqghRwOHHCxHLMzHEzTVfVSGw',
