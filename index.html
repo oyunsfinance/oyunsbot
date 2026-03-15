@@ -803,7 +803,7 @@ function buildFilter() {
   months.forEach(m=>{
     const b=document.createElement('button');
     b.className='mbtn'+(selM===m?' active':''); b.dataset.m=m;
-    const[y,mo]=m.split('-'); b.textContent=y.slice(2)+'.'+mo;
+    const parts=m.split('-'); b.textContent=(parts[0]||'').slice(2)+'/'+(parts[1]||'');
     b.onclick=function(){setM(m,this)}; bar.appendChild(b);
   });
 }
@@ -943,7 +943,7 @@ function updateCharts(filtered) {
   cM = new Chart($('cMonthly'), {
     type:'bar',
     data:{
-      labels:months.map(m=>{const[y,mo]=m.month.split('-');return y.slice(2)+'/'+mo;}),
+      labels:months.map(m=>{const p=m.month.split('-');return (p[0]||'').slice(2)+'/'+(p[1]||'');}),
       datasets:[{ data:months.map(m=>+(m.total/1e6).toFixed(1)), backgroundColor:months.map((m,i)=>m.month===selM?'rgba(16,185,129,0.7)':i===months.length-1?'rgba(99,102,241,0.6)':'rgba(99,102,241,0.3)'), borderColor:months.map(m=>m.month===selM?'#10b981':'rgba(99,102,241,0.6)'), borderWidth:1, borderRadius:4 }]
     },
     options:{
@@ -962,7 +962,7 @@ function updateCharts(filtered) {
   cP = new Chart($('cProfit'), {
     type:'line',
     data:{
-      labels:pm.map(m=>{const[y,mo]=m.month.split('-');return y.slice(2)+'/'+mo;}),
+      labels:pm.map(m=>{const p=m.month.split('-');return (p[0]||'').slice(2)+'/'+(p[1]||'');}),
       datasets:[{ data:pm.map(m=>m.count), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', borderWidth:2, pointRadius:2, pointBackgroundColor:'#3b82f6', fill:true, tension:0.4 }]
     },
     options:{
