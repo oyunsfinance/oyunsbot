@@ -943,7 +943,7 @@ function updateCharts(filtered) {
   cM = new Chart($('cMonthly'), {
     type:'bar',
     data:{
-      labels:months.map(m=>m.month.replace('20','')),
+      labels:months.map(m=>{const[y,mo]=m.month.split('-');return y.slice(2)+'/'+mo;}),
       datasets:[{ data:months.map(m=>+(m.total/1e6).toFixed(1)), backgroundColor:months.map((m,i)=>m.month===selM?'rgba(16,185,129,0.7)':i===months.length-1?'rgba(99,102,241,0.6)':'rgba(99,102,241,0.3)'), borderColor:months.map(m=>m.month===selM?'#10b981':'rgba(99,102,241,0.6)'), borderWidth:1, borderRadius:4 }]
     },
     options:{
@@ -962,7 +962,7 @@ function updateCharts(filtered) {
   cP = new Chart($('cProfit'), {
     type:'line',
     data:{
-      labels:pm.map(m=>m.month.replace('20','')),
+      labels:pm.map(m=>{const[y,mo]=m.month.split('-');return y.slice(2)+'/'+mo;}),
       datasets:[{ data:pm.map(m=>m.count), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', borderWidth:2, pointRadius:2, pointBackgroundColor:'#3b82f6', fill:true, tension:0.4 }]
     },
     options:{
