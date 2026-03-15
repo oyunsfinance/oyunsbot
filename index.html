@@ -497,7 +497,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;}
 <div class="insights-row" id="insightsRow">
   <div class="insight"><span class="insight-icon">📈</span><div><div class="insight-title">Сарын өсөлт</div><div class="insight-body" id="ins1">—</div></div></div>
   <div class="insight"><span class="insight-icon">👑</span><div><div class="insight-title">Идэвхтэй өдөр</div><div class="insight-body" id="ins2">—</div></div></div>
-  <div class="insight"><span class="insight-icon">👤</span><div><div class="insight-title">Шилдэг админ</div><div class="insight-body" id="ins3">—</div></div></div>
+  <div class="insight"><span class="insight-icon">🔄</span><div><div class="insight-title">Цалингийн хугацаа</div><div class="insight-body" id="ins3">—</div></div></div>
   <div class="insight"><span class="insight-icon">💰</span><div><div class="insight-title">Өдрийн дундаж</div><div class="insight-body" id="ins4">—</div></div></div>
 </div>
 
@@ -540,11 +540,21 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;}
   <div class="panel">
     <div class="panel-head" style="margin-bottom:4px"><div><div class="panel-title">💵 Цалингийн тооцоо</div><div class="panel-sub" id="salPer">—</div></div></div>
     <div class="sal-pair">
-      <div class="sal-box"><div class="sal-who">Сарнай</div><div class="sal-amt" id="salS">—</div><div class="sal-sub">хугацааны ашиг</div></div>
-      <div class="sal-box"><div class="sal-who">Ануужин</div><div class="sal-amt" id="salA">—</div><div class="sal-sub">хугацааны ашиг</div></div>
+      <div class="sal-box">
+        <div class="sal-who">Сарнай</div>
+        <div class="sal-amt" id="salS">—</div>
+        <div class="sal-sub">хугацааны ашиг</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px;font-family:var(--mono)" id="salSDetail">—</div>
+      </div>
+      <div class="sal-box">
+        <div class="sal-who">Ануужин</div>
+        <div class="sal-amt" id="salA">—</div>
+        <div class="sal-sub">хугацааны ашиг</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px;font-family:var(--mono)" id="salADetail">—</div>
+      </div>
     </div>
-    <div class="sum-line"><span class="sum-lbl">Нийт цалин</span><span class="sum-v" id="salT" style="color:var(--warn)">—</span></div>
-    <div class="sum-line" style="border-top:none;padding-top:0"><span class="sum-lbl">Нийт ашиг</span><span class="sum-v" id="salTP" style="color:var(--ok)">—</span></div>
+    <div class="sum-line"><span class="sum-lbl">Нийт цалин (хоёулаа)</span><span class="sum-v" id="salT" style="color:var(--warn)">—</span></div>
+    <div class="sum-line" style="border-top:none;padding-top:0"><span class="sum-lbl">Нийт ашиг (бүх хугацаа)</span><span class="sum-v" id="salTP" style="color:var(--ok)">—</span></div>
   </div>
 </div>
 
@@ -639,7 +649,7 @@ const csvUrl = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?
 // FALLBACK DATA
 // ══════════════════════════════════
 const FB = {
-  bal:{rub_total:31493717,rub_cur:668970,mnt_total:9316746,tootsoo:25350375,net_profit:8210490,total_profit:15460088,sal_s:1432232,sal_a:1148215,sal_t:2580447,sal_st:'2026-02-23',sal_en:'2026-03-22',today_profit:78452,today_date:'2026-03-04'},
+  bal:{rub_total:31493717,rub_cur:668970,mnt_total:9316746,tootsoo:25350375,net_profit:8210490,total_profit:15460088,sal_s:1144226,sal_a:794090,sal_t:1938316,sal_st:'2/23/2026',sal_en:'03/22/2026',sal_s_pay:0,sal_a_pay:0,today_profit:78452,today_date:'2026-03-04'},
   accs:[{admin_name:'Сарнай',bank_account_name:'Альфа1+2',balance:370976,updated:'',currency:'RUB'},{admin_name:'Ануужин',bank_account_name:'Альфа1+2',balance:820083,updated:'',currency:'RUB'}],
   daily:[{"month":"2025-10","day":"2025-10-01","count":31,"rub_mnt":72150,"mnt_rub":7268400,"sarnai":13,"anuujin":18},{"month":"2025-10","day":"2025-10-02","count":29,"rub_mnt":14200,"mnt_rub":6148100,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-03","count":30,"rub_mnt":36500,"mnt_rub":7267900,"sarnai":15,"anuujin":15},{"month":"2025-10","day":"2025-10-05","count":29,"rub_mnt":38000,"mnt_rub":6310700,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-06","count":27,"rub_mnt":9250,"mnt_rub":5702900,"sarnai":18,"anuujin":9},{"month":"2025-10","day":"2025-10-07","count":25,"rub_mnt":7500,"mnt_rub":5025600,"sarnai":15,"anuujin":10},{"month":"2025-10","day":"2025-10-08","count":27,"rub_mnt":24700,"mnt_rub":6046300,"sarnai":12,"anuujin":15},{"month":"2025-10","day":"2025-10-09","count":31,"rub_mnt":22700,"mnt_rub":6756600,"sarnai":17,"anuujin":14},{"month":"2025-10","day":"2025-10-10","count":34,"rub_mnt":26500,"mnt_rub":7293900,"sarnai":17,"anuujin":17},{"month":"2025-10","day":"2025-10-14","count":32,"rub_mnt":4200,"mnt_rub":7005500,"sarnai":18,"anuujin":14},{"month":"2025-10","day":"2025-10-16","count":31,"rub_mnt":53200,"mnt_rub":6436300,"sarnai":21,"anuujin":10},{"month":"2025-10","day":"2025-10-21","count":36,"rub_mnt":21000,"mnt_rub":7571500,"sarnai":20,"anuujin":16},{"month":"2025-10","day":"2025-10-22","count":32,"rub_mnt":39100,"mnt_rub":6440600,"sarnai":20,"anuujin":12},{"month":"2025-10","day":"2025-10-24","count":35,"rub_mnt":29000,"mnt_rub":7162600,"sarnai":17,"anuujin":18},{"month":"2025-10","day":"2025-10-27","count":34,"rub_mnt":32000,"mnt_rub":7051700,"sarnai":20,"anuujin":14},{"month":"2025-10","day":"2025-10-30","count":37,"rub_mnt":59800,"mnt_rub":7329500,"sarnai":20,"anuujin":17},{"month":"2025-11","day":"2025-11-03","count":27,"rub_mnt":52300,"mnt_rub":5066900,"sarnai":16,"anuujin":11},{"month":"2025-11","day":"2025-11-04","count":27,"rub_mnt":13941,"mnt_rub":5310600,"sarnai":11,"anuujin":16},{"month":"2025-11","day":"2025-11-05","count":26,"rub_mnt":20000,"mnt_rub":5000000,"sarnai":14,"anuujin":12},{"month":"2025-11","day":"2025-11-06","count":28,"rub_mnt":24700,"mnt_rub":5327600,"sarnai":15,"anuujin":13},{"month":"2025-11","day":"2025-11-07","count":24,"rub_mnt":12000,"mnt_rub":4580100,"sarnai":10,"anuujin":14},{"month":"2025-11","day":"2025-11-08","count":17,"rub_mnt":13000,"mnt_rub":2984200,"sarnai":7,"anuujin":10},{"month":"2025-11","day":"2025-11-09","count":20,"rub_mnt":8000,"mnt_rub":3630000,"sarnai":10,"anuujin":10},{"month":"2025-11","day":"2025-11-14","count":17,"rub_mnt":20000,"mnt_rub":2995300,"sarnai":2,"anuujin":15},{"month":"2025-12","day":"2025-12-14","count":12,"rub_mnt":0,"mnt_rub":2714800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-15","count":18,"rub_mnt":0,"mnt_rub":4325700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-16","count":17,"rub_mnt":0,"mnt_rub":4258700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-17","count":12,"rub_mnt":0,"mnt_rub":2803800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-23","count":11,"rub_mnt":0,"mnt_rub":5073000,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-24","count":15,"rub_mnt":0,"mnt_rub":4660400,"sarnai":9,"anuujin":6},{"month":"2025-12","day":"2025-12-25","count":10,"rub_mnt":0,"mnt_rub":3296900,"sarnai":5,"anuujin":5},{"month":"2025-12","day":"2025-12-26","count":16,"rub_mnt":0,"mnt_rub":7107600,"sarnai":8,"anuujin":8},{"month":"2025-12","day":"2025-12-30","count":11,"rub_mnt":0,"mnt_rub":4200800,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-31","count":7,"rub_mnt":0,"mnt_rub":3154450,"sarnai":3,"anuujin":4},{"month":"2026-01","day":"2026-01-07","count":19,"rub_mnt":0,"mnt_rub":9264900,"sarnai":10,"anuujin":9},{"month":"2026-01","day":"2026-01-08","count":27,"rub_mnt":0,"mnt_rub":13618000,"sarnai":16,"anuujin":11},{"month":"2026-01","day":"2026-01-13","count":25,"rub_mnt":0,"mnt_rub":15367300,"sarnai":14,"anuujin":11},{"month":"2026-01","day":"2026-01-14","count":31,"rub_mnt":0,"mnt_rub":18399300,"sarnai":16,"anuujin":15},{"month":"2026-01","day":"2026-01-16","count":32,"rub_mnt":0,"mnt_rub":20773300,"sarnai":17,"anuujin":15},{"month":"2026-01","day":"2026-01-22","count":22,"rub_mnt":0,"mnt_rub":16614100,"sarnai":11,"anuujin":11},{"month":"2026-01","day":"2026-01-24","count":28,"rub_mnt":0,"mnt_rub":18193800,"sarnai":14,"anuujin":14},{"month":"2026-01","day":"2026-01-26","count":30,"rub_mnt":0,"mnt_rub":17551900,"sarnai":16,"anuujin":14},{"month":"2026-01","day":"2026-01-27","count":31,"rub_mnt":0,"mnt_rub":17793800,"sarnai":17,"anuujin":14},{"month":"2026-01","day":"2026-01-31","count":34,"rub_mnt":0,"mnt_rub":16838700,"sarnai":18,"anuujin":16},{"month":"2026-02","day":"2026-02-01","count":41,"rub_mnt":0,"mnt_rub":23399400,"sarnai":26,"anuujin":15},{"month":"2026-02","day":"2026-02-04","count":37,"rub_mnt":0,"mnt_rub":20145000,"sarnai":20,"anuujin":17},{"month":"2026-02","day":"2026-02-07","count":35,"rub_mnt":0,"mnt_rub":17073700,"sarnai":22,"anuujin":13},{"month":"2026-02","day":"2026-02-09","count":36,"rub_mnt":0,"mnt_rub":18553700,"sarnai":24,"anuujin":12},{"month":"2026-02","day":"2026-02-10","count":45,"rub_mnt":0,"mnt_rub":23726800,"sarnai":28,"anuujin":17},{"month":"2026-02","day":"2026-02-12","count":37,"rub_mnt":0,"mnt_rub":18126100,"sarnai":23,"anuujin":14},{"month":"2026-02","day":"2026-02-17","count":38,"rub_mnt":0,"mnt_rub":17729400,"sarnai":22,"anuujin":16},{"month":"2026-02","day":"2026-02-18","count":40,"rub_mnt":0,"mnt_rub":20055300,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-19","count":40,"rub_mnt":0,"mnt_rub":20107089,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-20","count":54,"rub_mnt":0,"mnt_rub":27279600,"sarnai":33,"anuujin":21},{"month":"2026-02","day":"2026-02-22","count":42,"rub_mnt":0,"mnt_rub":14419096,"sarnai":24,"anuujin":18},{"month":"2026-02","day":"2026-02-24","count":29,"rub_mnt":0,"mnt_rub":13593672,"sarnai":15,"anuujin":14},{"month":"2026-02","day":"2026-02-27","count":38,"rub_mnt":0,"mnt_rub":14092503,"sarnai":21,"anuujin":17},{"month":"2026-02","day":"2026-02-28","count":26,"rub_mnt":66490,"mnt_rub":5949000,"sarnai":15,"anuujin":11},{"month":"2026-03","day":"2026-03-01","count":33,"rub_mnt":37388,"mnt_rub":6265700,"sarnai":11,"anuujin":22},{"month":"2026-03","day":"2026-03-02","count":39,"rub_mnt":50001,"mnt_rub":20440600,"sarnai":19,"anuujin":20},{"month":"2026-03","day":"2026-03-03","count":23,"rub_mnt":38880,"mnt_rub":2974000,"sarnai":17,"anuujin":6},{"month":"2026-03","day":"2026-03-04","count":20,"rub_mnt":15723,"mnt_rub":4060600,"sarnai":19,"anuujin":1}],
   monthly:[{"month":"2025-04","count":11,"total":5038500,"rub_mnt":9882,"mnt_rub":4999000,"sarnai":0,"anuujin":0},{"month":"2025-10","count":932,"total":209131784,"rub_mnt":1035062,"mnt_rub":208096722,"sarnai":516,"anuujin":416},{"month":"2025-11","count":246,"total":34873141,"rub_mnt":244341,"mnt_rub":34628800,"sarnai":116,"anuujin":130},{"month":"2025-12","count":681,"total":294375020,"rub_mnt":1098671,"mnt_rub":293276349,"sarnai":343,"anuujin":333},{"month":"2026-01","count":722,"total":358708703,"rub_mnt":875685,"mnt_rub":357833018,"sarnai":363,"anuujin":359},{"month":"2026-02","count":896,"total":323939244,"rub_mnt":1747612,"mnt_rub":322191632,"sarnai":530,"anuujin":364},{"month":"2026-03","count":115,"total":33882892,"rub_mnt":141992,"mnt_rub":33740900,"sarnai":66,"anuujin":49}]
@@ -828,44 +838,76 @@ async function doSync() {
         }
       } catch(e){}
     } catch(e){}
-    // Fetch General sheet for AG/AQ balances
-    // AG col = Сарнай дансны үлдэгдэл (өдөр бүр доод мөр дээр нэмэгддэг)
-    // AQ col = Ануужин дансны үлдэгдэл
-    // Хамгийн сүүлийн мөр = хамгийн шинэ баланс
+    // Fetch General sheet — AG(col32)=Сарнай, AQ(col42)=Ануужин дансны үлдэгдэл
     try {
       const gRes = await fetch(csvUrl('General'), {cache:'no-cache'});
       if(gRes.ok) {
         const gTxt = await gRes.text();
-        const gRows = parseCSV(gTxt);
-        // CSV-д AG=33-р багана (0-indexed=32), AQ=43-р багана (0-indexed=42)
-        // Header мөр 43 (index 42): "Дансны үлдэгдэл"
-        // Дата мөр 44-с эхэлнэ (index 43-с)
-        // Доороос дээш скан хийж хамгийн сүүлийн утгатай мөрийг авна
-        let sarnai_bal=null, anuujin_bal=null, sarnai_date='', anuujin_date='';
-        for(let i=gRows.length-1; i>=43; i--){
-          const vals = Object.values(gRows[i]);
-          const bDate = vals[1] || '';  // B багана = огноо
-          const agRaw = vals[32];       // AG багана = Сарнай
-          const aqRaw = vals[42];       // AQ багана = Ануужин
-          const agVal = agRaw !== '' && agRaw !== null && agRaw !== undefined ? parseFloat(agRaw) : NaN;
-          const aqVal = aqRaw !== '' && aqRaw !== null && aqRaw !== undefined ? parseFloat(aqRaw) : NaN;
-          // Сарнайн хамгийн сүүлийн утга (null/NaN биш)
-          if(sarnai_bal === null && !isNaN(agVal)){
-            sarnai_bal = agVal;
-            sarnai_date = bDate;
+        // Raw CSV parse — column indices тогтвортой байлгах
+        const parseRow = line => {
+          const vals=[]; let cur='', inQ=false;
+          for(let i=0;i<line.length;i++){
+            const ch=line[i];
+            if(ch==='"'){inQ=!inQ;}
+            else if(ch===','&&!inQ){vals.push(cur.replace(/^"|"$/g,'').trim());cur='';}
+            else cur+=ch;
           }
-          // Ануужингийн хамгийн сүүлийн утга
-          if(anuujin_bal === null && !isNaN(aqVal)){
-            anuujin_bal = aqVal;
-            anuujin_date = bDate;
-          }
-          if(sarnai_bal !== null && anuujin_bal !== null) break;
+          vals.push(cur.replace(/^"|"$/g,'').trim());
+          return vals;
+        };
+        const gRaw = gTxt.trim().split('\n').map(parseRow);
+        const pn = v => parseFloat((v||'').replace(/,/g,''))||0;
+
+        // Row 42 (idx 41) → 'Сарнай'/'Ануужин' header → col index динамик олно
+        const hdr41 = gRaw[41]||[];
+        let sCol=32, aCol=42;
+        hdr41.forEach((v,i)=>{ if(v.includes('Сарнай')) sCol=i; if(v.includes('Ануужин')) aCol=i; });
+
+        // Баланс: row 44+ (idx 43+), дээрээс доош давтаж СҮҮЛИЙН утгыг авна
+        let s_bal=0, a_bal=0, s_date='', a_date='';
+        for(let i=43; i<gRaw.length; i++){
+          const row=gRaw[i], b=(row[1]||'').trim();
+          if(sCol<row.length){ const v=pn(row[sCol]); if(v>0){s_bal=v; s_date=b;} }
+          if(aCol<row.length){ const v=pn(row[aCol]); if(v>0){a_bal=v; a_date=b;} }
         }
-        if(sarnai_bal !== null || anuujin_bal !== null){
-          D.accs = [
-            {admin_name:'Сарнай',  bank_account_name:'Альфа1+2', balance:sarnai_bal||0,  updated:sarnai_date,  currency:'RUB'},
-            {admin_name:'Ануужин', bank_account_name:'Альфа1+2', balance:anuujin_bal||0, updated:anuujin_date, currency:'RUB'},
+        if(s_bal||a_bal){
+          D.accs=[
+            {admin_name:'Сарнай',  bank_account_name:'Альфа1+2', balance:s_bal, updated:s_date, currency:'RUB'},
+            {admin_name:'Ануужин', bank_account_name:'Альфа1+2', balance:a_bal, updated:a_date, currency:'RUB'},
           ];
+        }
+
+        // ЦАЛИНГИЙН ТООЦООЛОЛ: N(13)=хугацаа, O(14)=Сарнай ашиг, P(15)=цалин, Q(16)=Ануужин ашиг, R(17)=цалин
+        // Row 7+ (idx 6+), сүүлийн мөрийг авна
+        let salRow=null;
+        for(let i=6; i<Math.min(20, gRaw.length); i++){
+          const r=gRaw[i]||[];
+          if((r[13]||'').includes('/') || (r[13]||'').includes('-')){
+            salRow=r;
+          }
+        }
+        if(salRow){
+          const np=(salRow[13]||'').trim().split(' - ');
+          D.bal.sal_st    = np[0]||'';
+          D.bal.sal_en    = np[1]||'';
+          D.bal.sal_s     = pn(salRow[14]); // O = Сарнай ашиг
+          D.bal.sal_a     = pn(salRow[16]); // Q = Ануужин ашиг
+          D.bal.sal_t     = D.bal.sal_s + D.bal.sal_a;
+          D.bal.sal_s_pay = pn(salRow[15]); // P = Сарнай цалин
+          D.bal.sal_a_pay = pn(salRow[17]); // R = Ануужин цалин
+        }
+                // Row 17 (idx 16): RUB→MNT — H=нийт, F=Сарнай, G=Ануужин
+        const r17=gRaw[16]||[], r18=gRaw[17]||[];
+        if(r17.length>7){
+          D.bal.sal_rub_mnt=pn(r17[7]);
+          D.sal_rub_mnt_s=pn(r17[5]);
+          D.sal_rub_mnt_a=pn(r17[6]);
+        }
+        // Row 18 (idx 17): MNT→RUB
+        if(r18.length>7){
+          D.bal.sal_mnt_rub=pn(r18[7]);
+          D.sal_mnt_rub_s=pn(r18[5]);
+          D.sal_mnt_rub_a=pn(r18[6]);
         }
       }
     } catch(e){ console.log('General fetch err:', e); }
@@ -929,15 +971,14 @@ function renderInsights(fil, tot) {
     const busiest = D.daily.reduce((a,b)=>b.count>a.count?b:a);
     $('ins2').innerHTML = `<span style="color:var(--warn)">${fmtDay(busiest.day)}</span> — ${busiest.count} гүйлгээ`;
   }
-  // 3. Top admin
-  const totalS = fil.reduce((a,d)=>a+d.sarnai,0);
-  const totalA = fil.reduce((a,d)=>a+d.anuujin,0);
-  const topAdmin = totalS >= totalA ? 'Сарнай' : 'Ануужин';
-  const topPct = (tot.count > 0 ? Math.max(totalS,totalA)/tot.count*100 : 51).toFixed(0);
-  $('ins3').innerHTML = `<span style="color:var(--ac2)">${topAdmin}</span> — ${topPct}% гүйлгээ`;
+  // 3. Salary period dates
+  const salStart = D.bal.sal_st || '2026-02-23';
+  const salEnd   = D.bal.sal_en || '2026-03-22';
+  $('ins3').innerHTML = `<span style="color:var(--ac2)">${salStart}</span> → ${salEnd}`;
   // 4. Avg daily volume
   const avgCount = fil.length > 0 ? (tot.count / fil.length).toFixed(1) : 0;
-  $('ins4').innerHTML = `Өдөрт дундаж <span style="color:var(--blue)">${avgCount}</span> гүйлгээ`;
+  const avgAmt   = fil.length > 0 ? Math.round((tot.mnt_rub + tot.rub_mnt) / fil.length) : 0;
+  $('ins4').innerHTML = `Өдөрт <span style="color:var(--blue)">${avgCount}</span> гүйлгээ · ₮${fmtN(avgAmt)}`;
 }
 
 // ══════════════════════════════════
@@ -1035,10 +1076,11 @@ function render() {
   $('kPer').textContent=selM==='all'?'Бүх хугацаа':fmtMonth(selM);
   $('kPerSub').textContent=fmtN(tot.count)+' гүйлгээ · ₮'+fmtN(tot.mnt_rub+tot.rub_mnt);
 
-  // Direction
+  // Direction — сонгосон filter-н дагуу transactions-с тооцооло
   $('dR2M').textContent=fmtR(tot.rub_mnt);
   $('dM2R').textContent=fmtM(tot.mnt_rub);
-  $('dR2MSub').textContent='RUB дүн'; $('dM2RSub').textContent='MNT дүн';
+  $('dR2MSub').textContent=selM==='all'?'Нийт хугацаа':fmtMonth(selM);
+  $('dM2RSub').textContent=selM==='all'?'Нийт хугацаа':fmtMonth(selM);
 
   // Admin
   const adminTotal=tot.sarnai+tot.anuujin;
@@ -1068,11 +1110,15 @@ function render() {
   $('chips').innerHTML=`<span class="tag tg">✓ ${rate}% амжилт</span><span class="tag ti">${fmtN(selM==='all'?tsucc:tot.count)} нийт</span><span class="tag ta">${selM==='all'?'Бүх хугацаа':fmtMonth(selM)}</span>`;
 
   // Salary
-  $('salPer').textContent=D.bal.sal_st+' → '+D.bal.sal_en;
+  $('salPer').textContent=(D.bal.sal_st||'2026-02-23')+' → '+(D.bal.sal_en||'2026-03-22');
   $('salS').textContent=fmtM(D.bal.sal_s);
   $('salA').textContent=fmtM(D.bal.sal_a);
   $('salT').textContent=fmtM(D.bal.sal_t);
   $('salTP').textContent=fmtM(D.bal.total_profit);
+  // Admin salary pay detail (P=Сарнай цалин, R=Ануужин цалин)
+  const salSEl=$('salSDetail'); const salAEl=$('salADetail');
+  if(salSEl && D.bal.sal_s_pay) salSEl.textContent='Цалин: '+fmtM(D.bal.sal_s_pay);
+  if(salAEl && D.bal.sal_a_pay) salAEl.textContent='Цалин: '+fmtM(D.bal.sal_a_pay);
 
   // Insights + Timeline
   renderInsights(fil, tot);
