@@ -1,15 +1,988 @@
 <!DOCTYPE html>
-<html lang="mn">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>OYUNS Finance</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="mn" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>OYUNS Finance · Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px;
+  --space-4: 16px; --space-5: 20px; --space-6: 24px;
+  --space-8: 32px;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: 150ms cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-bg:       #0a0a0f;
+  --color-surface:  #111118;
+  --color-card:     #16161f;
+  --color-card2:    #1c1c27;
+  --color-border:   #1f1f2e;
+  --color-border2:  #2a2a3d;
+  --color-text:     #e8e8f0;
+  --color-text2:    #9090b0;
+  --color-muted:    #50506a;
+  --color-accent:   #6366f1;
+  --color-accent2:  #818cf8;
+  --color-success:  #10b981;
+  --color-warning:  #f59e0b;
+  --color-danger:   #ef4444;
+  --color-blue:     #3b82f6;
+  --color-purple:   #a855f7;
+  --glow-accent:    rgba(99,102,241,0.15);
+  --glow-success:   rgba(16,185,129,0.12);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --color-bg:       #f8f8fc;
+  --color-surface:  #ffffff;
+  --color-card:     #ffffff;
+  --color-card2:    #f4f4f8;
+  --color-border:   #e8e8f0;
+  --color-border2:  #d8d8e8;
+  --color-text:     #0f0f1a;
+  --color-text2:    #5a5a7a;
+  --color-muted:    #9090b0;
+  --color-accent:   #4f46e5;
+  --color-accent2:  #6366f1;
+  --color-success:  #059669;
+  --color-warning:  #d97706;
+  --color-danger:   #dc2626;
+  --color-blue:     #2563eb;
+  --color-purple:   #9333ea;
+  --glow-accent:    rgba(79,70,229,0.08);
+  --glow-success:   rgba(5,150,105,0.08);
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 14px; }
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border2); border-radius: 2px; }
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-8);
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: var(--space-3); }
+.brand-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(99,102,241,0.3);
+}
+.brand-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.brand-sub { font-size: 10px; color: var(--color-muted); font-family: var(--font-mono); letter-spacing: 0.5px; }
+.header-right { display: flex; align-items: center; gap: var(--space-2); }
+
+/* Header buttons */
+.hbtn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: var(--radius-md);
+  font-size: 12px; font-weight: 500;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text2);
+  transition: all var(--transition);
+}
+.hbtn:hover { border-color: var(--color-border2); color: var(--color-text); }
+.hbtn.primary {
+  background: var(--glow-accent);
+  border-color: rgba(99,102,241,0.3);
+  color: var(--color-accent2);
+}
+.hbtn.primary:hover { background: rgba(99,102,241,0.2); }
+.hbtn .spin { display: inline-block; }
+.hbtn.loading .spin { animation: spin 0.8s linear infinite; }
+
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-family: var(--font-mono);
+  color: var(--color-success);
+  padding: 4px 10px;
+  background: var(--glow-success);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 20px;
+}
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-success); animation: pulse 2s infinite; }
+
+.theme-toggle {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  font-size: 15px;
+  transition: all var(--transition);
+}
+.theme-toggle:hover { border-color: var(--color-border2); }
+
+/* ═══════════════════════════════════════
+   STATUS BAR & NOTICE
+═══════════════════════════════════════ */
+.notice {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: 10px var(--space-4);
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius-lg);
+  font-size: 12px; color: var(--color-warning);
+  margin-bottom: var(--space-4);
+}
+.notice.hidden { display: none; }
+.sbar {
+  padding: 9px var(--space-4); border-radius: var(--radius-md);
+  font-size: 12px; font-family: var(--font-mono);
+  margin-bottom: var(--space-4); text-align: center;
+}
+.sbar.ok { background: var(--glow-success); color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); }
+.sbar.err { background: rgba(239,68,68,0.08); color: var(--color-danger); border: 1px solid rgba(239,68,68,0.2); }
+.sbar.hidden { display: none; }
+
+/* ═══════════════════════════════════════
+   MONTH FILTER
+═══════════════════════════════════════ */
+.filter-row {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-5); flex-wrap: wrap;
+}
+.filter-label { font-size: 11px; color: var(--color-muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.8px; margin-right: var(--space-1); }
+.mbtn {
+  padding: 4px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 11px; font-family: var(--font-mono);
+  transition: all var(--transition);
+}
+.mbtn:hover { border-color: var(--color-border2); color: var(--color-text2); }
+.mbtn.active {
+  background: var(--glow-accent);
+  border-color: rgba(99,102,241,0.35);
+  color: var(--color-accent2);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════
+   BALANCE HERO — TOP PRIORITY
+═══════════════════════════════════════ */
+.hero {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #111118 0%, #14141f 100%);
+  border-color: var(--color-border);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.hero-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--color-muted); font-family: var(--font-mono); }
+.hero-meta { font-size: 11px; color: var(--color-muted); font-family: var(--font-mono); }
+
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.bal-card {
+  background: var(--color-card2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: border-color var(--transition);
+}
+.bal-card:hover { border-color: var(--color-border2); }
+.bal-tag {
+  display: inline-flex; align-items: center;
+  font-size: 9px; font-family: var(--font-mono); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 2px 7px; border-radius: 4px;
+  margin-bottom: var(--space-3);
+}
+.tag-rub { background: rgba(59,130,246,0.12); color: var(--color-blue); border: 1px solid rgba(59,130,246,0.2); }
+.tag-mnt { background: rgba(16,185,129,0.1); color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); }
+.tag-profit { background: rgba(16,185,129,0.1); color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); }
+.tag-salary { background: rgba(245,158,11,0.1); color: var(--color-warning); border: 1px solid rgba(245,158,11,0.2); }
+.bal-label { font-size: 11px; color: var(--color-text2); margin-bottom: var(--space-1); }
+.bal-value {
+  font-size: 22px; font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -0.8px; line-height: 1.1;
+}
+.bal-sub { font-size: 10px; color: var(--color-muted); margin-top: 5px; font-family: var(--font-mono); }
+
+.acc-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+.acc-item {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px var(--space-3);
+}
+.acc-bank { font-size: 10px; color: var(--color-muted); font-family: var(--font-mono); }
+.acc-owner { font-size: 11px; font-weight: 600; color: var(--color-text2); margin-top: 2px; }
+.acc-bal { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--color-blue); margin-top: 3px; }
+
+/* ═══════════════════════════════════════
+   KPI GRID
+═══════════════════════════════════════ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.kpi-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.kpi-card:hover { border-color: var(--color-border2); transform: translateY(-1px); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--kpi-color, var(--color-accent));
+  opacity: 0.6;
+}
+.kpi-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  background: var(--kpi-bg, rgba(99,102,241,0.1));
+  margin-bottom: var(--space-3);
+}
+.kpi-label { font-size: 11px; font-weight: 500; color: var(--color-text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--space-2); }
+.kpi-value {
+  font-size: 28px; font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -1px; line-height: 1;
+  color: var(--color-text);
+}
+.kpi-note { font-size: 11px; color: var(--color-muted); margin-top: var(--space-2); font-family: var(--font-mono); }
+.kpi-note .up { color: var(--color-success); }
+.kpi-note .dn { color: var(--color-danger); }
+
+/* ═══════════════════════════════════════
+   CHARTS SECTION
+═══════════════════════════════════════ */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.panel {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+.panel-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.panel-title { font-size: 13px; font-weight: 600; color: var(--color-text); }
+.panel-sub { font-size: 11px; color: var(--color-muted); margin-top: 2px; }
+.chart-legend { display: flex; gap: var(--space-4); }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text2); }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+.chart-wrap { position: relative; height: 200px; }
+
+/* ═══════════════════════════════════════
+   BOTTOM GRID
+═══════════════════════════════════════ */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-4);
+}
+
+/* Direction cards */
+.dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }
+.dir-card {
+  background: var(--color-card2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+.dir-label { font-size: 10px; color: var(--color-muted); font-family: var(--font-mono); margin-bottom: var(--space-2); }
+.dir-value { font-size: 18px; font-weight: 700; font-family: var(--font-mono); letter-spacing: -0.5px; }
+
+/* Admin bars */
+.admin-item {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-item:last-child { border-bottom: none; }
+.admin-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+.admin-avatar {
+  width: 26px; height: 26px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+}
+.admin-name-wrap { margin-left: var(--space-2); }
+.admin-name { font-size: 12px; font-weight: 600; }
+.admin-count { font-size: 10px; color: var(--color-muted); font-family: var(--font-mono); }
+.admin-pct { font-size: 12px; font-weight: 600; font-family: var(--font-mono); }
+.bar-track { height: 3px; background: var(--color-border); border-radius: 2px; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+/* Salary */
+.sal-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-4); }
+.sal-box {
+  background: var(--color-card2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+.sal-who { font-size: 10px; color: var(--color-muted); margin-bottom: var(--space-1); }
+.sal-amt { font-size: 16px; font-weight: 700; font-family: var(--font-mono); color: var(--color-warning); }
+.sal-sub { font-size: 9px; color: var(--color-muted); margin-top: 2px; }
+.summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-3) 0; border-top: 1px solid var(--color-border);
+  font-size: 12px;
+}
+.summary-label { color: var(--color-text2); }
+.summary-val { font-family: var(--font-mono); font-weight: 600; }
+
+/* Tags/chips */
+.tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: var(--space-3); }
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-family: var(--font-mono); font-weight: 600;
+}
+.tag-green { background: rgba(16,185,129,0.1); color: var(--color-success); border: 1px solid rgba(16,185,129,0.2); }
+.tag-indigo { background: var(--glow-accent); color: var(--color-accent2); border: 1px solid rgba(99,102,241,0.2); }
+.tag-amber { background: rgba(245,158,11,0.1); color: var(--color-warning); border: 1px solid rgba(245,158,11,0.2); }
+
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--color-border); margin: var(--space-4) 0; }
+
+/* Animations */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.panel, .kpi-card, .hero, .bal-card { animation: fadeUp 0.3s ease both; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .balance-grid { grid-template-columns: 1fr 1fr; }
+  .acc-row { grid-template-columns: 1fr 1fr; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .shell { padding: 0 var(--space-4) var(--space-6); }
+}
+@media (max-width: 600px) {
+  .balance-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 22px; }
+  .bal-value { font-size: 18px; }
+  .header-right .hbtn span:not(.spin) { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-mark">О</div>
+    <div>
+      <div class="brand-name">OYUNS Finance</div>
+      <div class="brand-sub">AIO BOT · ANALYTICS</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <button class="hbtn primary" id="syncBtn" onclick="doSync()">
+      <span class="spin">↻</span> <span>Sheets sync</span>
+    </button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Theme">🌙</button>
+    <div style="font-size:11px;color:var(--color-muted);font-family:var(--font-mono)" id="dateDisplay"></div>
+  </div>
+</header>
+
+<!-- NOTICE -->
+<div class="notice" id="notice">
+  <span>⚠</span>
+  <span>Google Sheets нийтэд нээлттэй болгоно уу: <b>Share → Anyone with the link → Viewer</b></span>
+</div>
+
+<!-- STATUS -->
+<div class="sbar hidden" id="sbar"></div>
+
+<!-- MONTH FILTER -->
+<div class="filter-row" id="fbar">
+  <span class="filter-label">Шүүх:</span>
+  <button class="mbtn active" data-m="all" onclick="setM('all',this)">Нийт</button>
+</div>
+
+<!-- BALANCE HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-title">🏦 Баланс · Ашиг · Данс</div>
+    <div class="hero-meta" id="balUpd">—</div>
+  </div>
+  <div class="balance-grid">
+    <div class="bal-card">
+      <span class="bal-tag tag-rub">RUB</span>
+      <div class="bal-label">Одоогийн үлдэгдэл</div>
+      <div class="bal-value" id="bRub" style="color:var(--color-blue)">—</div>
+      <div class="bal-sub" id="bRubSub">—</div>
+    </div>
+    <div class="bal-card">
+      <span class="bal-tag tag-mnt">MNT</span>
+      <div class="bal-label">Одоогийн үлдэгдэл</div>
+      <div class="bal-value" id="bMnt" style="color:var(--color-success)">—</div>
+      <div class="bal-sub" id="bMntSub">—</div>
+    </div>
+    <div class="bal-card">
+      <span class="bal-tag tag-profit">АШИГ</span>
+      <div class="bal-label">Цэвэр ашиг</div>
+      <div class="bal-value" id="bProfit" style="color:var(--color-success)">—</div>
+      <div class="bal-sub" id="bProfitSub">—</div>
+    </div>
+    <div class="bal-card">
+      <span class="bal-tag tag-salary">ЦАЛИН</span>
+      <div class="bal-label">Цалингийн хоног</div>
+      <div class="bal-value" id="bSal" style="color:var(--color-warning)">—</div>
+      <div class="bal-sub" id="bSalSub">—</div>
+    </div>
+  </div>
+  <div class="acc-row" id="accGrid"></div>
+</div>
+
+<!-- KPI -->
+<div class="kpi-grid">
+  <div class="kpi-card" style="--kpi-color:var(--color-accent);--kpi-bg:rgba(99,102,241,0.1)">
+    <div class="kpi-icon">📊</div>
+    <div class="kpi-label">Нийт гүйлгээ</div>
+    <div class="kpi-value" id="kTx">—</div>
+    <div class="kpi-note"><span class="up" id="kS">—</span> · <span class="dn" id="kR">—</span></div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:var(--color-success);--kpi-bg:rgba(16,185,129,0.1)">
+    <div class="kpi-icon">⚡</div>
+    <div class="kpi-label">Амжилтын хувь</div>
+    <div class="kpi-value" id="kRate">—</div>
+    <div class="kpi-note" id="kToday">—</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:var(--color-warning);--kpi-bg:rgba(245,158,11,0.1)">
+    <div class="kpi-icon">⏱</div>
+    <div class="kpi-label">Дундаж хугацаа</div>
+    <div class="kpi-value" id="kTime">29.4m</div>
+    <div class="kpi-note" id="kTProfit">—</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:var(--color-blue);--kpi-bg:rgba(59,130,246,0.1)">
+    <div class="kpi-icon">📅</div>
+    <div class="kpi-label">Сонгосон хугацаа</div>
+    <div class="kpi-value" id="kPer">—</div>
+    <div class="kpi-note" id="kPerSub">—</div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-row">
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Өдрийн гүйлгээний динамик</div>
+        <div class="panel-sub" id="chartSub">Амжилттай гүйлгээний тоо ба дүн</div>
+      </div>
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--color-accent)"></div>Тоо</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--color-success)"></div>Дүн</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="cDaily"></canvas></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Сарын эргэлт</div>
+        <div class="panel-sub">Нийт дүн · M₮</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="cMonthly"></canvas></div>
+  </div>
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom-grid">
+  <!-- Direction -->
+  <div class="panel">
+    <div class="panel-head" style="margin-bottom:var(--space-4)">
+      <div class="panel-title">💱 Чиглэлийн Статистик</div>
+    </div>
+    <div class="dir-grid">
+      <div class="dir-card">
+        <div class="dir-label">RUB → MNT</div>
+        <div class="dir-value" id="dR2M" style="color:var(--color-success)">—</div>
+        <div style="font-size:10px;color:var(--color-muted);margin-top:3px" id="dR2MSub">—</div>
+      </div>
+      <div class="dir-card">
+        <div class="dir-label">MNT → RUB</div>
+        <div class="dir-value" id="dM2R" style="color:var(--color-warning)">—</div>
+        <div style="font-size:10px;color:var(--color-muted);margin-top:3px" id="dM2RSub">—</div>
+      </div>
+    </div>
+    <hr class="divider">
+    <div style="font-size:12px;font-weight:600;margin-bottom:var(--space-3)">📈 Сарын гүйлгээний тоо</div>
+    <div style="position:relative;height:110px"><canvas id="cProfit"></canvas></div>
+  </div>
+
+  <!-- Admin -->
+  <div class="panel">
+    <div class="panel-head" style="margin-bottom:var(--space-4)">
+      <div class="panel-title">👤 Админ Гүйлгээ</div>
+    </div>
+    <div id="adminRows"></div>
+    <hr class="divider">
+    <div class="tags" id="chips"></div>
+  </div>
+
+  <!-- Salary -->
+  <div class="panel">
+    <div class="panel-head" style="margin-bottom:var(--space-2)">
+      <div>
+        <div class="panel-title">💵 Цалингийн тооцоо</div>
+        <div class="panel-sub" id="salPer">—</div>
+      </div>
+    </div>
+    <div class="sal-pair">
+      <div class="sal-box">
+        <div class="sal-who">Сарнай</div>
+        <div class="sal-amt" id="salS">—</div>
+        <div class="sal-sub">хугацааны ашиг</div>
+      </div>
+      <div class="sal-box">
+        <div class="sal-who">Ануужин</div>
+        <div class="sal-amt" id="salA">—</div>
+        <div class="sal-sub">хугацааны ашиг</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Нийт цалин</span>
+      <span class="summary-val" id="salT" style="color:var(--color-warning)">—</span>
+    </div>
+    <div class="summary-row" style="border-top:none;padding-top:0">
+      <span class="summary-label">Нийт ашиг (бүх)</span>
+      <span class="summary-val" id="salTP" style="color:var(--color-success)">—</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+// ══════════════════════════════════
+// THEME
+// ══════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('oyuns_theme', html.dataset.theme);
+  if (cD) updateCharts(selM === 'all' ? D.daily : D.daily.filter(d => d.month === selM));
+}
+(function(){
+  const saved = localStorage.getItem('oyuns_theme');
+  if (saved) {
+    document.documentElement.dataset.theme = saved;
+    document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '🌙' : '☀️';
+  }
+})();
+
+// ══════════════════════════════════
+// CONFIG
+// ══════════════════════════════════
+const SHEET_ID = '1GW52bElP8qJVUxP_vLiqghRwOHHCxHLMzHEzTVfVSGw';
+const csvUrl = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(s)}`;
+
+// ══════════════════════════════════
+// FALLBACK DATA
+// ══════════════════════════════════
+const FB = {
+  bal:{rub_total:31493717,rub_cur:668970,mnt_total:9316746,tootsoo:25350375,net_profit:8210490,total_profit:15460088,sal_s:1432232,sal_a:1148215,sal_t:2580447,sal_st:'2026-02-23',sal_en:'2026-03-22',today_profit:78452,today_date:'2026-03-04'},
+  accs:[{admin_name:'Ануужин',bank_account_name:'Альфа1',balance:258459},{admin_name:'Сарнай',bank_account_name:'Альфа 1',balance:91640},{admin_name:'Сарнай',bank_account_name:'Альфа2',balance:196169},{admin_name:'Ануужин',bank_account_name:'Альфа2',balance:185886}],
+  daily:[{"month":"2025-10","day":"2025-10-01","count":31,"rub_mnt":72150,"mnt_rub":7268400,"sarnai":13,"anuujin":18},{"month":"2025-10","day":"2025-10-02","count":29,"rub_mnt":14200,"mnt_rub":6148100,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-03","count":30,"rub_mnt":36500,"mnt_rub":7267900,"sarnai":15,"anuujin":15},{"month":"2025-10","day":"2025-10-05","count":29,"rub_mnt":38000,"mnt_rub":6310700,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-06","count":27,"rub_mnt":9250,"mnt_rub":5702900,"sarnai":18,"anuujin":9},{"month":"2025-10","day":"2025-10-07","count":25,"rub_mnt":7500,"mnt_rub":5025600,"sarnai":15,"anuujin":10},{"month":"2025-10","day":"2025-10-08","count":27,"rub_mnt":24700,"mnt_rub":6046300,"sarnai":12,"anuujin":15},{"month":"2025-10","day":"2025-10-09","count":31,"rub_mnt":22700,"mnt_rub":6756600,"sarnai":17,"anuujin":14},{"month":"2025-10","day":"2025-10-10","count":34,"rub_mnt":26500,"mnt_rub":7293900,"sarnai":17,"anuujin":17},{"month":"2025-10","day":"2025-10-14","count":32,"rub_mnt":4200,"mnt_rub":7005500,"sarnai":18,"anuujin":14},{"month":"2025-10","day":"2025-10-16","count":31,"rub_mnt":53200,"mnt_rub":6436300,"sarnai":21,"anuujin":10},{"month":"2025-10","day":"2025-10-21","count":36,"rub_mnt":21000,"mnt_rub":7571500,"sarnai":20,"anuujin":16},{"month":"2025-10","day":"2025-10-22","count":32,"rub_mnt":39100,"mnt_rub":6440600,"sarnai":20,"anuujin":12},{"month":"2025-10","day":"2025-10-24","count":35,"rub_mnt":29000,"mnt_rub":7162600,"sarnai":17,"anuujin":18},{"month":"2025-10","day":"2025-10-27","count":34,"rub_mnt":32000,"mnt_rub":7051700,"sarnai":20,"anuujin":14},{"month":"2025-10","day":"2025-10-30","count":37,"rub_mnt":59800,"mnt_rub":7329500,"sarnai":20,"anuujin":17},{"month":"2025-11","day":"2025-11-03","count":27,"rub_mnt":52300,"mnt_rub":5066900,"sarnai":16,"anuujin":11},{"month":"2025-11","day":"2025-11-04","count":27,"rub_mnt":13941,"mnt_rub":5310600,"sarnai":11,"anuujin":16},{"month":"2025-11","day":"2025-11-05","count":26,"rub_mnt":20000,"mnt_rub":5000000,"sarnai":14,"anuujin":12},{"month":"2025-11","day":"2025-11-06","count":28,"rub_mnt":24700,"mnt_rub":5327600,"sarnai":15,"anuujin":13},{"month":"2025-11","day":"2025-11-07","count":24,"rub_mnt":12000,"mnt_rub":4580100,"sarnai":10,"anuujin":14},{"month":"2025-11","day":"2025-11-08","count":17,"rub_mnt":13000,"mnt_rub":2984200,"sarnai":7,"anuujin":10},{"month":"2025-11","day":"2025-11-09","count":20,"rub_mnt":8000,"mnt_rub":3630000,"sarnai":10,"anuujin":10},{"month":"2025-11","day":"2025-11-14","count":17,"rub_mnt":20000,"mnt_rub":2995300,"sarnai":2,"anuujin":15},{"month":"2025-12","day":"2025-12-14","count":12,"rub_mnt":0,"mnt_rub":2714800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-15","count":18,"rub_mnt":0,"mnt_rub":4325700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-16","count":17,"rub_mnt":0,"mnt_rub":4258700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-17","count":12,"rub_mnt":0,"mnt_rub":2803800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-23","count":11,"rub_mnt":0,"mnt_rub":5073000,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-24","count":15,"rub_mnt":0,"mnt_rub":4660400,"sarnai":9,"anuujin":6},{"month":"2025-12","day":"2025-12-25","count":10,"rub_mnt":0,"mnt_rub":3296900,"sarnai":5,"anuujin":5},{"month":"2025-12","day":"2025-12-26","count":16,"rub_mnt":0,"mnt_rub":7107600,"sarnai":8,"anuujin":8},{"month":"2025-12","day":"2025-12-30","count":11,"rub_mnt":0,"mnt_rub":4200800,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-31","count":7,"rub_mnt":0,"mnt_rub":3154450,"sarnai":3,"anuujin":4},{"month":"2026-01","day":"2026-01-07","count":19,"rub_mnt":0,"mnt_rub":9264900,"sarnai":10,"anuujin":9},{"month":"2026-01","day":"2026-01-08","count":27,"rub_mnt":0,"mnt_rub":13618000,"sarnai":16,"anuujin":11},{"month":"2026-01","day":"2026-01-13","count":25,"rub_mnt":0,"mnt_rub":15367300,"sarnai":14,"anuujin":11},{"month":"2026-01","day":"2026-01-14","count":31,"rub_mnt":0,"mnt_rub":18399300,"sarnai":16,"anuujin":15},{"month":"2026-01","day":"2026-01-16","count":32,"rub_mnt":0,"mnt_rub":20773300,"sarnai":17,"anuujin":15},{"month":"2026-01","day":"2026-01-22","count":22,"rub_mnt":0,"mnt_rub":16614100,"sarnai":11,"anuujin":11},{"month":"2026-01","day":"2026-01-24","count":28,"rub_mnt":0,"mnt_rub":18193800,"sarnai":14,"anuujin":14},{"month":"2026-01","day":"2026-01-26","count":30,"rub_mnt":0,"mnt_rub":17551900,"sarnai":16,"anuujin":14},{"month":"2026-01","day":"2026-01-27","count":31,"rub_mnt":0,"mnt_rub":17793800,"sarnai":17,"anuujin":14},{"month":"2026-01","day":"2026-01-31","count":34,"rub_mnt":0,"mnt_rub":16838700,"sarnai":18,"anuujin":16},{"month":"2026-02","day":"2026-02-01","count":41,"rub_mnt":0,"mnt_rub":23399400,"sarnai":26,"anuujin":15},{"month":"2026-02","day":"2026-02-04","count":37,"rub_mnt":0,"mnt_rub":20145000,"sarnai":20,"anuujin":17},{"month":"2026-02","day":"2026-02-07","count":35,"rub_mnt":0,"mnt_rub":17073700,"sarnai":22,"anuujin":13},{"month":"2026-02","day":"2026-02-09","count":36,"rub_mnt":0,"mnt_rub":18553700,"sarnai":24,"anuujin":12},{"month":"2026-02","day":"2026-02-10","count":45,"rub_mnt":0,"mnt_rub":23726800,"sarnai":28,"anuujin":17},{"month":"2026-02","day":"2026-02-12","count":37,"rub_mnt":0,"mnt_rub":18126100,"sarnai":23,"anuujin":14},{"month":"2026-02","day":"2026-02-17","count":38,"rub_mnt":0,"mnt_rub":17729400,"sarnai":22,"anuujin":16},{"month":"2026-02","day":"2026-02-18","count":40,"rub_mnt":0,"mnt_rub":20055300,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-19","count":40,"rub_mnt":0,"mnt_rub":20107089,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-20","count":54,"rub_mnt":0,"mnt_rub":27279600,"sarnai":33,"anuujin":21},{"month":"2026-02","day":"2026-02-22","count":42,"rub_mnt":0,"mnt_rub":14419096,"sarnai":24,"anuujin":18},{"month":"2026-02","day":"2026-02-24","count":29,"rub_mnt":0,"mnt_rub":13593672,"sarnai":15,"anuujin":14},{"month":"2026-02","day":"2026-02-27","count":38,"rub_mnt":0,"mnt_rub":14092503,"sarnai":21,"anuujin":17},{"month":"2026-02","day":"2026-02-28","count":26,"rub_mnt":66490,"mnt_rub":5949000,"sarnai":15,"anuujin":11},{"month":"2026-03","day":"2026-03-01","count":33,"rub_mnt":37388,"mnt_rub":6265700,"sarnai":11,"anuujin":22},{"month":"2026-03","day":"2026-03-02","count":39,"rub_mnt":50001,"mnt_rub":20440600,"sarnai":19,"anuujin":20},{"month":"2026-03","day":"2026-03-03","count":23,"rub_mnt":38880,"mnt_rub":2974000,"sarnai":17,"anuujin":6},{"month":"2026-03","day":"2026-03-04","count":20,"rub_mnt":15723,"mnt_rub":4060600,"sarnai":19,"anuujin":1}],
+  monthly:[{"month":"2025-04","count":11,"total":5038500,"rub_mnt":9882,"mnt_rub":4999000,"sarnai":0,"anuujin":0},{"month":"2025-10","count":932,"total":209131784,"rub_mnt":1035062,"mnt_rub":208096722,"sarnai":516,"anuujin":416},{"month":"2025-11","count":246,"total":34873141,"rub_mnt":244341,"mnt_rub":34628800,"sarnai":116,"anuujin":130},{"month":"2025-12","count":681,"total":294375020,"rub_mnt":1098671,"mnt_rub":293276349,"sarnai":343,"anuujin":333},{"month":"2026-01","count":722,"total":358708703,"rub_mnt":875685,"mnt_rub":357833018,"sarnai":363,"anuujin":359},{"month":"2026-02","count":896,"total":323939244,"rub_mnt":1747612,"mnt_rub":322191632,"sarnai":530,"anuujin":364},{"month":"2026-03","count":115,"total":33882892,"rub_mnt":141992,"mnt_rub":33740900,"sarnai":66,"anuujin":49}]
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let D = JSON.parse(JSON.stringify(FB));
+let selM = 'all';
+let cD=null, cM=null, cP=null;
+
+// ══════════════════════════════════
+// HELPERS
+// ══════════════════════════════════
+const fmt=(n,d=0)=>Math.abs(n)>=1e9?(n/1e9).toFixed(1)+'B':Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(0)+'K':n.toFixed(d);
+const fmtM=n=>'₮'+fmt(n);
+const fmtN=n=>Math.round(n).toLocaleString('mn-MN');
+const $=id=>document.getElementById(id);
+
+function isDark() { return document.documentElement.dataset.theme === 'dark'; }
+function gridColor() { return isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)'; }
+function tickColor() { return isDark() ? '#50506a' : '#9090b0'; }
+function tooltipBg() { return isDark() ? '#1c1c27' : '#ffffff'; }
+function tooltipBorder() { return isDark() ? '#2a2a3d' : '#e8e8f0'; }
+
+// ══════════════════════════════════
+// CSV PARSER
+// ══════════════════════════════════
+function parseCSV(txt) {
+  const lines = txt.trim().split('\n');
+  const hdrs = lines[0].match(/(".*?"|[^,\n]+)/g)||[];
+  const clean = s => s.replace(/^"|"$/g,'').trim();
+  const heads = hdrs.map(clean);
+  return lines.slice(1).map(line => {
+    const vals=[]; let cur='', inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){inQ=!inQ}else if(c===','&&!inQ){vals.push(cur);cur=''}else cur+=c;
+    }
+    vals.push(cur);
+    const row={};
+    heads.forEach((h,i)=>row[h]=clean(vals[i]||''));
+    return row;
+  });
+}
+
+// ══════════════════════════════════
+// SYNC
+// ══════════════════════════════════
+async function doSync() {
+  const btn = $('syncBtn');
+  btn.classList.add('loading');
+  showSbar('Google Sheets-с дата татаж байна...','ok');
+  try {
+    const r = await fetch(csvUrl('transactions'), {cache:'no-cache'});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const txt = await r.text();
+    if(txt.includes('Unauthorized')||txt.includes('Login')) throw new Error('Sheet нийтэд нээлттэй биш');
+    const rows = parseCSV(txt);
+    if(!rows.length) throw new Error('Хоосон өгөгдөл');
+    const succ = rows.filter(r=>(r.status||'').toLowerCase().trim()==='successful');
+    const rej  = rows.filter(r=>(r.status||'').toLowerCase().trim()==='rejected');
+    const dMap={}, mMap={};
+    succ.forEach(r=>{
+      const raw=r.date||''; const d=raw.substring(0,10); if(!d||d.length<8) return;
+      const m=d.substring(0,7); const amt=parseFloat(r.amount)||0;
+      const cf=(r.currency_from||'').toLowerCase(); const adm=parseInt(r.successful_by_admin)||0;
+      if(!dMap[d]) dMap[d]={month:m,day:d,count:0,rub_mnt:0,mnt_rub:0,sarnai:0,anuujin:0};
+      dMap[d].count++; if(cf==='rub') dMap[d].rub_mnt+=amt; else dMap[d].mnt_rub+=amt;
+      if(adm===1409343588) dMap[d].sarnai++; if(adm===5564298862) dMap[d].anuujin++;
+      if(!mMap[m]) mMap[m]={month:m,count:0,total:0,rub_mnt:0,mnt_rub:0,sarnai:0,anuujin:0};
+      mMap[m].count++; mMap[m].total+=amt;
+      if(cf==='rub') mMap[m].rub_mnt+=amt; else mMap[m].mnt_rub+=amt;
+      if(adm===1409343588) mMap[m].sarnai++; if(adm===5564298862) mMap[m].anuujin++;
+    });
+    D.daily   = Object.values(dMap).sort((a,b)=>a.day.localeCompare(b.day));
+    D.monthly = Object.values(mMap).sort((a,b)=>a.month.localeCompare(b.month));
+    D._tot=rows.length; D._succ=succ.length; D._rej=rej.length;
+    try {
+      const a=await fetch(csvUrl('ActiveAcc'),{cache:'no-cache'});
+      if(a.ok){const at=await a.text();const ar=parseCSV(at);if(ar.length) D.accs=ar.map(r=>({admin_name:r.admin_name||'',bank_account_name:r.bank_account_name||'',balance:parseFloat(r.balance)||0}))}
+    } catch(e){}
+    $('notice').classList.add('hidden');
+    showSbar(`✓ Синк амжилттай · ${rows.length} гүйлгээ · ${new Date().toLocaleTimeString('mn-MN')}`,'ok');
+    buildFilter(); render();
+  } catch(err) {
+    showSbar(`⚠ ${err.message}`,'err');
+  } finally { btn.classList.remove('loading'); }
+}
+
+function showSbar(msg,type) {
+  const e=$('sbar'); e.textContent=msg; e.className='sbar '+type;
+  if(type==='ok') setTimeout(()=>e.classList.add('hidden'),6000);
+}
+
+// ══════════════════════════════════
+// FILTER
+// ══════════════════════════════════
+function setM(m,el) {
+  selM=m;
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function buildFilter() {
+  const months=[...new Set(D.daily.map(d=>d.month))].sort();
+  const bar=$('fbar');
+  bar.innerHTML='<span class="filter-label">Шүүх:</span>';
+  const ab=document.createElement('button');
+  ab.className='mbtn'+(selM==='all'?' active':''); ab.dataset.m='all'; ab.textContent='Нийт';
+  ab.onclick=function(){setM('all',this)}; bar.appendChild(ab);
+  months.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='mbtn'+(selM===m?' active':''); b.dataset.m=m;
+    const[y,mo]=m.split('-'); b.textContent=y.slice(2)+'.'+mo;
+    b.onclick=function(){setM(m,this)}; bar.appendChild(b);
+  });
+}
+
+// ══════════════════════════════════
+// RENDER
+// ══════════════════════════════════
+function render() {
+  const fil = selM==='all' ? D.daily : D.daily.filter(d=>d.month===selM);
+  const tot = fil.reduce((a,d)=>({count:a.count+d.count,rub_mnt:a.rub_mnt+d.rub_mnt,mnt_rub:a.mnt_rub+d.mnt_rub,sarnai:a.sarnai+d.sarnai,anuujin:a.anuujin+d.anuujin}),{count:0,rub_mnt:0,mnt_rub:0,sarnai:0,anuujin:0});
+  const ttx=D._tot||6493, tsucc=D._succ||6233, trej=D._rej||260;
+  const dispTx=selM==='all'?ttx:tot.count;
+  const dispSucc=selM==='all'?tsucc:tot.count;
+  const rate=ttx>0?(tsucc/ttx*100).toFixed(1):'96.0';
+  const td=D.daily.find(d=>d.day===D.bal.today_date);
+
+  // Balance
+  $('bRub').textContent='₽'+fmtN(D.bal.rub_cur);
+  $('bRubSub').textContent='Нийт эргэлт: ₽'+fmt(D.bal.rub_total);
+  $('bMnt').textContent=fmtM(D.bal.mnt_total);
+  $('bMntSub').textContent='МНТ данс нийт үлдэгдэл';
+  $('bProfit').textContent=fmtM(D.bal.net_profit);
+  $('bProfitSub').textContent='Нийт ашиг: '+fmtM(D.bal.total_profit);
+  $('bSal').textContent=fmtM(D.bal.sal_t);
+  $('bSalSub').textContent=D.bal.sal_st+' → '+D.bal.sal_en;
+  $('balUpd').textContent='Шинэчлэгдсэн: '+D.bal.today_date;
+  $('accGrid').innerHTML=(D.accs||FB.accs).map(a=>`<div class="acc-item"><div class="acc-bank">${a.bank_account_name}</div><div class="acc-owner">${a.admin_name}</div><div class="acc-bal">₽${fmtN(a.balance)}</div></div>`).join('');
+
+  // KPI
+  $('kTx').textContent=fmtN(dispTx);
+  $('kS').textContent='✓ '+fmtN(dispSucc);
+  $('kR').textContent='✗ '+(selM==='all'?trej:'—');
+  $('kRate').textContent=rate+'%';
+  $('kToday').textContent=td?`Өнөөдөр: ${td.count} гүйлгээ`:(selM==='all'?'Бүх хугацаа':selM);
+  $('kTProfit').textContent='Өнөөдрийн ашиг: '+fmtM(D.bal.today_profit);
+  $('kPer').textContent=selM==='all'?'Apr\'25–Mar\'26':selM;
+  $('kPerSub').textContent=fmtN(tot.count)+' гүйлгээ · '+fmtM(tot.mnt_rub+tot.rub_mnt);
+
+  // Direction
+  $('dR2M').textContent='₽'+fmt(tot.rub_mnt);
+  $('dM2R').textContent=fmtM(tot.mnt_rub);
+  $('dR2MSub').textContent='RUB дүн';
+  $('dM2RSub').textContent='MNT дүн';
+
+  // Admin
+  const adminTotal=tot.sarnai+tot.anuujin;
+  const sp=adminTotal>0?(tot.sarnai/adminTotal*100).toFixed(0):51;
+  const ap=adminTotal>0?(tot.anuujin/adminTotal*100).toFixed(0):48;
+  $('adminRows').innerHTML=`
+    <div class="admin-item">
+      <div class="admin-top">
+        <div style="display:flex;align-items:center">
+          <div class="admin-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">С</div>
+          <div class="admin-name-wrap"><div class="admin-name">Сарнай</div><div class="admin-count">${fmtN(tot.sarnai||2585)} гүйлгээ</div></div>
+        </div>
+        <div class="admin-pct" style="color:var(--color-accent)">${sp}%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${sp}%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div></div>
+    </div>
+    <div class="admin-item">
+      <div class="admin-top">
+        <div style="display:flex;align-items:center">
+          <div class="admin-avatar" style="background:linear-gradient(135deg,#ef4444,#f97316)">А</div>
+          <div class="admin-name-wrap"><div class="admin-name">Ануужин</div><div class="admin-count">${fmtN(tot.anuujin||2422)} гүйлгээ</div></div>
+        </div>
+        <div class="admin-pct" style="color:var(--color-danger)">${ap}%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${ap}%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+    </div>`;
+  $('chips').innerHTML=`
+    <span class="tag tag-green">✓ ${rate}% амжилт</span>
+    <span class="tag tag-indigo">${fmtN(selM==='all'?tsucc:tot.count)} нийт</span>
+    <span class="tag tag-amber">${selM==='all'?'Бүх хугацаа':selM}</span>`;
+
+  // Salary
+  $('salPer').textContent=D.bal.sal_st+' → '+D.bal.sal_en;
+  $('salS').textContent=fmtM(D.bal.sal_s);
+  $('salA').textContent=fmtM(D.bal.sal_a);
+  $('salT').textContent=fmtM(D.bal.sal_t);
+  $('salTP').textContent=fmtM(D.bal.total_profit);
+
+  // Charts
+  updateCharts(fil);
+}
+
+// ══════════════════════════════════
+// CHARTS
+// ══════════════════════════════════
+function tooltipDefaults() {
+  return {
+    backgroundColor: tooltipBg(),
+    borderColor: tooltipBorder(),
+    borderWidth: 1,
+    titleColor: isDark()?'#e8e8f0':'#0f0f1a',
+    bodyColor: isDark()?'#9090b0':'#5a5a7a',
+    padding: 10,
+    cornerRadius: 8,
+    displayColors: false,
+  };
+}
+
+function updateCharts(filtered) {
+  $('chartSub').textContent = selM==='all'
+    ? `Сүүлийн ${Math.min(filtered.length,60)} хоног`
+    : `${selM} сар · өдрийн гүйлгээ`;
+
+  const display = selM==='all' ? filtered.slice(-60) : filtered;
+  const labels = display.map(d=>{const dt=new Date(d.day);return(dt.getMonth()+1)+'/'+(dt.getDate());});
+  const counts  = display.map(d=>d.count);
+  const amounts = display.map(d=>+((d.mnt_rub+d.rub_mnt)/1e6).toFixed(2));
+
+  // Daily chart
+  if(cD) cD.destroy();
+  cD = new Chart($('cDaily'), {
+    data: {
+      labels,
+      datasets: [
+        { type:'bar', label:'Тоо', data:counts, backgroundColor:'rgba(99,102,241,0.5)', borderColor:'rgba(99,102,241,0.8)', borderWidth:1, borderRadius:3, yAxisID:'y1', order:2 },
+        { type:'line', label:'Дүн (M₮)', data:amounts, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.07)', borderWidth:2, pointRadius:0, pointHoverRadius:4, fill:true, tension:0.4, yAxisID:'y2', order:1 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>ctx.datasetIndex===0?` ${ctx.raw} гүйлгээ`:` ₮${ctx.raw}M`}} },
+      scales:{
+        x:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},maxTicksLimit:14,maxRotation:0}, border:{color:'transparent'} },
+        y1:{ position:'left', grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10}}, border:{color:'transparent'} },
+        y2:{ position:'right', grid:{display:false}, ticks:{color:'#10b981',font:{size:10},callback:v=>v+'M'}, border:{color:'transparent'} }
+      }
+    }
+  });
+
+  // Monthly chart
+  const months = selM==='all' ? D.monthly.slice(-10) : D.monthly;
+  if(cM) cM.destroy();
+  cM = new Chart($('cMonthly'), {
+    type:'bar',
+    data:{
+      labels:months.map(m=>m.month.replace('20','')),
+      datasets:[{ data:months.map(m=>+(m.total/1e6).toFixed(1)), backgroundColor:months.map((m,i)=>m.month===selM?'rgba(16,185,129,0.7)':i===months.length-1?'rgba(99,102,241,0.6)':'rgba(99,102,241,0.3)'), borderColor:months.map(m=>m.month===selM?'#10b981':'rgba(99,102,241,0.6)'), borderWidth:1, borderRadius:4 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>{const m=months[ctx.dataIndex];return ` ₮${ctx.raw}M · ${m.count} гүйлгээ`;}}} },
+      scales:{
+        x:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},maxRotation:45}, border:{color:'transparent'} },
+        y:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},callback:v=>v+'M'}, border:{color:'transparent'} }
+      }
+    }
+  });
+
+  // Profit mini
+  const pm = D.monthly.slice(-8);
+  if(cP) cP.destroy();
+  cP = new Chart($('cProfit'), {
+    type:'line',
+    data:{
+      labels:pm.map(m=>m.month.replace('20','')),
+      datasets:[{ data:pm.map(m=>m.count), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', borderWidth:2, pointRadius:2, pointBackgroundColor:'#3b82f6', fill:true, tension:0.4 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>` ${ctx.raw} гүйлгээ`}} },
+      scales:{
+        x:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:9},maxRotation:45}, border:{color:'transparent'} },
+        y:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:9}}, border:{color:'transparent'} }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+$('dateDisplay').textContent = new Date().toLocaleDateString('mn-MN',{year:'numeric',month:'short',day:'numeric'});
+buildFilter();
+render();
+window.addEventListener('load', ()=>setTimeout(doSync, 800));
+</script>
+</body>
 </html>
