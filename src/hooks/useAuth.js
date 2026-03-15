@@ -42,16 +42,15 @@ export function useAuth() {
   }, [])
 
   const loginWithPin = (username, pin) => {
-    const found = CONFIG.ALLOWED_USERS.find(
-      u => u.username === username && u.pin === pin
-    )
+    // PIN шаардлагагүй — зөвхөн хэрэглэгчийн нэрээр нэвтрэнэ
+    const found = CONFIG.ALLOWED_USERS.find(u => u.username === username)
     if (found) {
       saveSession(found)
       setUser(found)
       setError(null)
       return true
     }
-    setError('Нэр эсвэл PIN буруу байна.')
+    setError('Хэрэглэгч олдсонгүй.')
     return false
   }
 

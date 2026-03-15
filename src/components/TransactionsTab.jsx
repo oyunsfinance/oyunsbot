@@ -71,13 +71,17 @@ export default function TransactionsTab({ user }) {
 
       {/* Month quick-select */}
       <div style={S.monthScroll}>
-        {months.slice(0, 8).map(m => (
-          <button key={m}
-            style={{ ...S.mTag, ...(selectedMonth===m ? S.mTagActive : {}) }}
-            onClick={() => setSelectedMonth(selectedMonth===m ? null : m)}>
-            {m.replace('20','')}
-          </button>
-        ))}
+        {months.map(m => {
+          const [y, mo] = m.split('-')
+          const label = y.slice(2) + '/' + mo
+          return (
+            <button key={m}
+              style={{ ...S.mTag, ...(selectedMonth===m ? S.mTagActive : {}) }}
+              onClick={() => setSelectedMonth(selectedMonth===m ? null : m)}>
+              {label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Stats row */}
