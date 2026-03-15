@@ -274,22 +274,83 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .bal-sub { font-size: 10px; color: var(--color-muted); margin-top: 5px; font-family: var(--font-mono); }
 
-.acc-row {
+
+.admin-sum-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-4);
+  margin-top: var(--space-2);
 }
-.acc-item {
+.sum-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 10px var(--space-3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  transition: border-color var(--transition);
 }
-.acc-bank { font-size: 10px; color: var(--color-muted); font-family: var(--font-mono); }
-.acc-owner { font-size: 11px; font-weight: 600; color: var(--color-text2); margin-top: 2px; }
-.acc-bal { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--color-blue); margin-top: 3px; }
+.sum-card:hover { border-color: var(--color-border2); }
+.sum-left {}
+.sum-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+.sum-accounts {
+  font-size: 10px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-2);
+}
+.sum-total {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -0.8px;
+  color: var(--color-blue);
+  line-height: 1;
+}
+.sum-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.sum-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sum-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.sum-item-name {
+  font-size: 10px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+}
+.sum-item-val {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--color-text2);
+  min-width: 70px;
+  text-align: right;
+}
+.sum-updated {
+  font-size: 10px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  margin-top: var(--space-2);
+}
+
 
 /* ═══════════════════════════════════════
    KPI GRID
@@ -532,7 +593,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <div class="bal-sub" id="bSalSub">—</div>
     </div>
   </div>
-  <div class="acc-row" id="accGrid"></div>
+  <!-- Admin summary cards -->
+  <div class="admin-sum-row" id="adminSumRow"></div>
 </div>
 
 <!-- KPI -->
@@ -687,7 +749,7 @@ const csvUrl = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?
 // ══════════════════════════════════
 const FB = {
   bal:{rub_total:31493717,rub_cur:668970,mnt_total:9316746,tootsoo:25350375,net_profit:8210490,total_profit:15460088,sal_s:1432232,sal_a:1148215,sal_t:2580447,sal_st:'2026-02-23',sal_en:'2026-03-22',today_profit:78452,today_date:'2026-03-04'},
-  accs:[{admin_name:'Ануужин',bank_account_name:'Альфа1',balance:258459},{admin_name:'Сарнай',bank_account_name:'Альфа 1',balance:91640},{admin_name:'Сарнай',bank_account_name:'Альфа2',balance:196169},{admin_name:'Ануужин',bank_account_name:'Альфа2',balance:185886}],
+  accs:[{admin_name:'Ануужин',bank_account_name:'Альфа1',balance:258459,updated:'3/3/2026'},{admin_name:'Сарнай',bank_account_name:'Альфа 1',balance:91640,updated:'3/5/2026'},{admin_name:'Сарнай',bank_account_name:'Альфа2',balance:196169,updated:'3/5/2026'},{admin_name:'Ануужин',bank_account_name:'Альфа2',balance:185886,updated:'3/3/2026'}],
   daily:[{"month":"2025-10","day":"2025-10-01","count":31,"rub_mnt":72150,"mnt_rub":7268400,"sarnai":13,"anuujin":18},{"month":"2025-10","day":"2025-10-02","count":29,"rub_mnt":14200,"mnt_rub":6148100,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-03","count":30,"rub_mnt":36500,"mnt_rub":7267900,"sarnai":15,"anuujin":15},{"month":"2025-10","day":"2025-10-05","count":29,"rub_mnt":38000,"mnt_rub":6310700,"sarnai":14,"anuujin":15},{"month":"2025-10","day":"2025-10-06","count":27,"rub_mnt":9250,"mnt_rub":5702900,"sarnai":18,"anuujin":9},{"month":"2025-10","day":"2025-10-07","count":25,"rub_mnt":7500,"mnt_rub":5025600,"sarnai":15,"anuujin":10},{"month":"2025-10","day":"2025-10-08","count":27,"rub_mnt":24700,"mnt_rub":6046300,"sarnai":12,"anuujin":15},{"month":"2025-10","day":"2025-10-09","count":31,"rub_mnt":22700,"mnt_rub":6756600,"sarnai":17,"anuujin":14},{"month":"2025-10","day":"2025-10-10","count":34,"rub_mnt":26500,"mnt_rub":7293900,"sarnai":17,"anuujin":17},{"month":"2025-10","day":"2025-10-14","count":32,"rub_mnt":4200,"mnt_rub":7005500,"sarnai":18,"anuujin":14},{"month":"2025-10","day":"2025-10-16","count":31,"rub_mnt":53200,"mnt_rub":6436300,"sarnai":21,"anuujin":10},{"month":"2025-10","day":"2025-10-21","count":36,"rub_mnt":21000,"mnt_rub":7571500,"sarnai":20,"anuujin":16},{"month":"2025-10","day":"2025-10-22","count":32,"rub_mnt":39100,"mnt_rub":6440600,"sarnai":20,"anuujin":12},{"month":"2025-10","day":"2025-10-24","count":35,"rub_mnt":29000,"mnt_rub":7162600,"sarnai":17,"anuujin":18},{"month":"2025-10","day":"2025-10-27","count":34,"rub_mnt":32000,"mnt_rub":7051700,"sarnai":20,"anuujin":14},{"month":"2025-10","day":"2025-10-30","count":37,"rub_mnt":59800,"mnt_rub":7329500,"sarnai":20,"anuujin":17},{"month":"2025-11","day":"2025-11-03","count":27,"rub_mnt":52300,"mnt_rub":5066900,"sarnai":16,"anuujin":11},{"month":"2025-11","day":"2025-11-04","count":27,"rub_mnt":13941,"mnt_rub":5310600,"sarnai":11,"anuujin":16},{"month":"2025-11","day":"2025-11-05","count":26,"rub_mnt":20000,"mnt_rub":5000000,"sarnai":14,"anuujin":12},{"month":"2025-11","day":"2025-11-06","count":28,"rub_mnt":24700,"mnt_rub":5327600,"sarnai":15,"anuujin":13},{"month":"2025-11","day":"2025-11-07","count":24,"rub_mnt":12000,"mnt_rub":4580100,"sarnai":10,"anuujin":14},{"month":"2025-11","day":"2025-11-08","count":17,"rub_mnt":13000,"mnt_rub":2984200,"sarnai":7,"anuujin":10},{"month":"2025-11","day":"2025-11-09","count":20,"rub_mnt":8000,"mnt_rub":3630000,"sarnai":10,"anuujin":10},{"month":"2025-11","day":"2025-11-14","count":17,"rub_mnt":20000,"mnt_rub":2995300,"sarnai":2,"anuujin":15},{"month":"2025-12","day":"2025-12-14","count":12,"rub_mnt":0,"mnt_rub":2714800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-15","count":18,"rub_mnt":0,"mnt_rub":4325700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-16","count":17,"rub_mnt":0,"mnt_rub":4258700,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-17","count":12,"rub_mnt":0,"mnt_rub":2803800,"sarnai":0,"anuujin":0},{"month":"2025-12","day":"2025-12-23","count":11,"rub_mnt":0,"mnt_rub":5073000,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-24","count":15,"rub_mnt":0,"mnt_rub":4660400,"sarnai":9,"anuujin":6},{"month":"2025-12","day":"2025-12-25","count":10,"rub_mnt":0,"mnt_rub":3296900,"sarnai":5,"anuujin":5},{"month":"2025-12","day":"2025-12-26","count":16,"rub_mnt":0,"mnt_rub":7107600,"sarnai":8,"anuujin":8},{"month":"2025-12","day":"2025-12-30","count":11,"rub_mnt":0,"mnt_rub":4200800,"sarnai":5,"anuujin":6},{"month":"2025-12","day":"2025-12-31","count":7,"rub_mnt":0,"mnt_rub":3154450,"sarnai":3,"anuujin":4},{"month":"2026-01","day":"2026-01-07","count":19,"rub_mnt":0,"mnt_rub":9264900,"sarnai":10,"anuujin":9},{"month":"2026-01","day":"2026-01-08","count":27,"rub_mnt":0,"mnt_rub":13618000,"sarnai":16,"anuujin":11},{"month":"2026-01","day":"2026-01-13","count":25,"rub_mnt":0,"mnt_rub":15367300,"sarnai":14,"anuujin":11},{"month":"2026-01","day":"2026-01-14","count":31,"rub_mnt":0,"mnt_rub":18399300,"sarnai":16,"anuujin":15},{"month":"2026-01","day":"2026-01-16","count":32,"rub_mnt":0,"mnt_rub":20773300,"sarnai":17,"anuujin":15},{"month":"2026-01","day":"2026-01-22","count":22,"rub_mnt":0,"mnt_rub":16614100,"sarnai":11,"anuujin":11},{"month":"2026-01","day":"2026-01-24","count":28,"rub_mnt":0,"mnt_rub":18193800,"sarnai":14,"anuujin":14},{"month":"2026-01","day":"2026-01-26","count":30,"rub_mnt":0,"mnt_rub":17551900,"sarnai":16,"anuujin":14},{"month":"2026-01","day":"2026-01-27","count":31,"rub_mnt":0,"mnt_rub":17793800,"sarnai":17,"anuujin":14},{"month":"2026-01","day":"2026-01-31","count":34,"rub_mnt":0,"mnt_rub":16838700,"sarnai":18,"anuujin":16},{"month":"2026-02","day":"2026-02-01","count":41,"rub_mnt":0,"mnt_rub":23399400,"sarnai":26,"anuujin":15},{"month":"2026-02","day":"2026-02-04","count":37,"rub_mnt":0,"mnt_rub":20145000,"sarnai":20,"anuujin":17},{"month":"2026-02","day":"2026-02-07","count":35,"rub_mnt":0,"mnt_rub":17073700,"sarnai":22,"anuujin":13},{"month":"2026-02","day":"2026-02-09","count":36,"rub_mnt":0,"mnt_rub":18553700,"sarnai":24,"anuujin":12},{"month":"2026-02","day":"2026-02-10","count":45,"rub_mnt":0,"mnt_rub":23726800,"sarnai":28,"anuujin":17},{"month":"2026-02","day":"2026-02-12","count":37,"rub_mnt":0,"mnt_rub":18126100,"sarnai":23,"anuujin":14},{"month":"2026-02","day":"2026-02-17","count":38,"rub_mnt":0,"mnt_rub":17729400,"sarnai":22,"anuujin":16},{"month":"2026-02","day":"2026-02-18","count":40,"rub_mnt":0,"mnt_rub":20055300,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-19","count":40,"rub_mnt":0,"mnt_rub":20107089,"sarnai":24,"anuujin":16},{"month":"2026-02","day":"2026-02-20","count":54,"rub_mnt":0,"mnt_rub":27279600,"sarnai":33,"anuujin":21},{"month":"2026-02","day":"2026-02-22","count":42,"rub_mnt":0,"mnt_rub":14419096,"sarnai":24,"anuujin":18},{"month":"2026-02","day":"2026-02-24","count":29,"rub_mnt":0,"mnt_rub":13593672,"sarnai":15,"anuujin":14},{"month":"2026-02","day":"2026-02-27","count":38,"rub_mnt":0,"mnt_rub":14092503,"sarnai":21,"anuujin":17},{"month":"2026-02","day":"2026-02-28","count":26,"rub_mnt":66490,"mnt_rub":5949000,"sarnai":15,"anuujin":11},{"month":"2026-03","day":"2026-03-01","count":33,"rub_mnt":37388,"mnt_rub":6265700,"sarnai":11,"anuujin":22},{"month":"2026-03","day":"2026-03-02","count":39,"rub_mnt":50001,"mnt_rub":20440600,"sarnai":19,"anuujin":20},{"month":"2026-03","day":"2026-03-03","count":23,"rub_mnt":38880,"mnt_rub":2974000,"sarnai":17,"anuujin":6},{"month":"2026-03","day":"2026-03-04","count":20,"rub_mnt":15723,"mnt_rub":4060600,"sarnai":19,"anuujin":1}],
   monthly:[{"month":"2025-04","count":11,"total":5038500,"rub_mnt":9882,"mnt_rub":4999000,"sarnai":0,"anuujin":0},{"month":"2025-10","count":932,"total":209131784,"rub_mnt":1035062,"mnt_rub":208096722,"sarnai":516,"anuujin":416},{"month":"2025-11","count":246,"total":34873141,"rub_mnt":244341,"mnt_rub":34628800,"sarnai":116,"anuujin":130},{"month":"2025-12","count":681,"total":294375020,"rub_mnt":1098671,"mnt_rub":293276349,"sarnai":343,"anuujin":333},{"month":"2026-01","count":722,"total":358708703,"rub_mnt":875685,"mnt_rub":357833018,"sarnai":363,"anuujin":359},{"month":"2026-02","count":896,"total":323939244,"rub_mnt":1747612,"mnt_rub":322191632,"sarnai":530,"anuujin":364},{"month":"2026-03","count":115,"total":33882892,"rub_mnt":141992,"mnt_rub":33740900,"sarnai":66,"anuujin":49}]
 };
@@ -702,9 +764,15 @@ let cD=null, cM=null, cP=null;
 // ══════════════════════════════════
 // HELPERS
 // ══════════════════════════════════
-const fmt=(n,d=0)=>Math.abs(n)>=1e9?(n/1e9).toFixed(1)+'B':Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(0)+'K':n.toFixed(d);
-const fmtM=n=>'₮'+fmt(n);
-const fmtN=n=>Math.round(n).toLocaleString('mn-MN');
+// Тоог K/M/B-гүй таслалтай бүтнээр харуулна
+const fmtN=n=>Math.round(n).toLocaleString('en-US');
+const fmt=n=>fmtN(n);
+const fmtM=n=>'₮'+fmtN(n);
+const fmtR=n=>'₽'+fmtN(n);
+// YYYY-MM-DD -> M/D/YYYY
+const fmtDay=d=>{if(!d)return'—';const p=d.split('-');return parseInt(p[1])+'/'+parseInt(p[2])+'/'+p[0];};
+// YYYY-MM -> M/YYYY  
+const fmtMonth=m=>{if(!m)return'—';const p=m.split('-');return parseInt(p[1])+'/'+p[0];};
 const $=id=>document.getElementById(id);
 
 function isDark() { return document.documentElement.dataset.theme === 'dark'; }
@@ -768,7 +836,25 @@ async function doSync() {
     D._tot=rows.length; D._succ=succ.length; D._rej=rej.length;
     try {
       const a=await fetch(csvUrl('ActiveAcc'),{cache:'no-cache'});
-      if(a.ok){const at=await a.text();const ar=parseCSV(at);if(ar.length) D.accs=ar.map(r=>({admin_name:r.admin_name||'',bank_account_name:r.bank_account_name||'',balance:parseFloat(r.balance)||0}))}
+      if(a.ok){const at=await a.text();const ar=parseCSV(at);if(ar.length) D.accs=ar.map(r=>({admin_name:r.admin_name||'',bank_account_name:r.bank_account_name||'',balance:parseFloat(r.balance)||0,currency:r.currency||'RUB',updated:r.comment||''}))}
+      // Try BalanceLog for updated dates
+      try {
+        const bl=await fetch(csvUrl('BalanceLog'),{cache:'no-cache'});
+        if(bl.ok){
+          const blt=await bl.text();const blr=parseCSV(blt);
+          if(blr.length){
+            // Get latest logged_at per account
+            const latestMap={};
+            blr.forEach(r=>{
+              const key=(r.bank_account_name||'').trim();
+              if(!latestMap[key]||r.logged_at_iso>latestMap[key].iso){
+                latestMap[key]={date:r.logged_at||'',iso:r.logged_at_iso||''};
+              }
+            });
+            D.accs=D.accs.map(a=>({...a,updated:latestMap[(a.bank_account_name||'').trim()]?.date||a.updated||''}));
+          }
+        }
+      } catch(e){}
     } catch(e){}
     $('notice').classList.add('hidden');
     showSbar(`✓ Синк амжилттай · ${rows.length} гүйлгээ · ${new Date().toLocaleTimeString('mn-MN')}`,'ok');
@@ -803,7 +889,7 @@ function buildFilter() {
   months.forEach(m=>{
     const b=document.createElement('button');
     b.className='mbtn'+(selM===m?' active':''); b.dataset.m=m;
-    const parts=m.split('-'); b.textContent=(parts[0]||'').slice(2)+'/'+(parts[1]||'');
+    b.textContent=fmtMonth(m);
     b.onclick=function(){setM(m,this)}; bar.appendChild(b);
   });
 }
@@ -822,7 +908,7 @@ function render() {
 
   // Balance
   $('bRub').textContent='₽'+fmtN(D.bal.rub_cur);
-  $('bRubSub').textContent='Нийт эргэлт: ₽'+fmt(D.bal.rub_total);
+  $('bRubSub').textContent='Нийт эргэлт: '+fmtR(D.bal.rub_total);
   $('bMnt').textContent=fmtM(D.bal.mnt_total);
   $('bMntSub').textContent='МНТ данс нийт үлдэгдэл';
   $('bProfit').textContent=fmtM(D.bal.net_profit);
@@ -830,20 +916,45 @@ function render() {
   $('bSal').textContent=fmtM(D.bal.sal_t);
   $('bSalSub').textContent=D.bal.sal_st+' → '+D.bal.sal_en;
   $('balUpd').textContent='Шинэчлэгдсэн: '+D.bal.today_date;
-  $('accGrid').innerHTML=(D.accs||FB.accs).map(a=>`<div class="acc-item"><div class="acc-bank">${a.bank_account_name}</div><div class="acc-owner">${a.admin_name}</div><div class="acc-bal">₽${fmtN(a.balance)}</div></div>`).join('');
+  const accs = D.accs||FB.accs;
+
+  // Admin summary cards
+  const admins = ['Сарнай','Ануужин'];
+  const sumColors = {Сарнай:'var(--color-accent)',Ануужин:'var(--color-danger)'};
+  $('adminSumRow').innerHTML = admins.map(name=>{
+    const myAccs = accs.filter(a=>a.admin_name===name && a.currency!=='MNT');
+    const total = myAccs.reduce((s,a)=>s+a.balance,0);
+    const lastUpdated = myAccs.map(a=>a.updated||'').filter(Boolean).sort().reverse()[0]||'—';
+    const breakdown = myAccs.map(a=>`
+      <div class="sum-item">
+        <span class="sum-item-name">${a.bank_account_name}</span>
+        <span class="sum-item-val">₽${fmtN(a.balance)}</span>
+      </div>`).join('');
+    return `<div class="sum-card">
+      <div class="sum-left">
+        <div class="sum-name">${name}</div>
+        <div class="sum-accounts">${myAccs.map(a=>a.bank_account_name).join(' + ')}</div>
+        <div class="sum-total" style="color:${sumColors[name]}">₽${fmtN(total)}</div>
+      </div>
+      <div class="sum-right">
+        <div class="sum-breakdown">${breakdown}</div>
+        <div class="sum-updated">Шинэчлэгдсэн: ${lastUpdated}</div>
+      </div>
+    </div>`;
+  }).join('');
 
   // KPI
   $('kTx').textContent=fmtN(dispTx);
   $('kS').textContent='✓ '+fmtN(dispSucc);
   $('kR').textContent='✗ '+(selM==='all'?trej:'—');
   $('kRate').textContent=rate+'%';
-  $('kToday').textContent=td?`Өнөөдөр: ${td.count} гүйлгээ`:(selM==='all'?'Бүх хугацаа':selM);
+  $('kToday').textContent=td?`Өнөөдөр: ${td.count} гүйлгээ`:(selM==='all'?'Бүх хугацаа':fmtMonth(selM));
   $('kTProfit').textContent='Өнөөдрийн ашиг: '+fmtM(D.bal.today_profit);
-  $('kPer').textContent=selM==='all'?'Apr\'25–Mar\'26':selM;
-  $('kPerSub').textContent=fmtN(tot.count)+' гүйлгээ · '+fmtM(tot.mnt_rub+tot.rub_mnt);
+  $('kPer').textContent=selM==='all'?'Бүх хугацаа':fmtMonth(selM);
+  $('kPerSub').textContent=fmtN(tot.count)+' гүйлгээ · ₮'+fmtN(tot.mnt_rub+tot.rub_mnt);
 
   // Direction
-  $('dR2M').textContent='₽'+fmt(tot.rub_mnt);
+  $('dR2M').textContent=fmtR(tot.rub_mnt);
   $('dM2R').textContent=fmtM(tot.mnt_rub);
   $('dR2MSub').textContent='RUB дүн';
   $('dM2RSub').textContent='MNT дүн';
@@ -876,7 +987,7 @@ function render() {
   $('chips').innerHTML=`
     <span class="tag tag-green">✓ ${rate}% амжилт</span>
     <span class="tag tag-indigo">${fmtN(selM==='all'?tsucc:tot.count)} нийт</span>
-    <span class="tag tag-amber">${selM==='all'?'Бүх хугацаа':selM}</span>`;
+    <span class="tag tag-amber">${selM==='all'?'Бүх хугацаа':fmtMonth(selM)}</span>`;
 
   // Salary
   $('salPer').textContent=D.bal.sal_st+' → '+D.bal.sal_en;
@@ -908,12 +1019,12 @@ function tooltipDefaults() {
 function updateCharts(filtered) {
   $('chartSub').textContent = selM==='all'
     ? `Сүүлийн ${Math.min(filtered.length,60)} хоног`
-    : `${selM} сар · өдрийн гүйлгээ`;
+    : `${fmtMonth(selM)} · өдрийн гүйлгээ`;
 
   const display = selM==='all' ? filtered.slice(-60) : filtered;
-  const labels = display.map(d=>{const dt=new Date(d.day);return(dt.getMonth()+1)+'/'+(dt.getDate());});
+  const labels = display.map(d=>fmtDay(d.day));
   const counts  = display.map(d=>d.count);
-  const amounts = display.map(d=>+((d.mnt_rub+d.rub_mnt)/1e6).toFixed(2));
+  const amounts = display.map(d=>Math.round(d.mnt_rub+d.rub_mnt));
 
   // Daily chart
   if(cD) cD.destroy();
@@ -928,11 +1039,11 @@ function updateCharts(filtered) {
     options: {
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>ctx.datasetIndex===0?` ${ctx.raw} гүйлгээ`:` ₮${ctx.raw}M`}} },
+      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>ctx.datasetIndex===0?` ${ctx.raw} гүйлгээ`:` ₮${fmtN(ctx.raw)}`}} },
       scales:{
         x:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},maxTicksLimit:14,maxRotation:0}, border:{color:'transparent'} },
         y1:{ position:'left', grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10}}, border:{color:'transparent'} },
-        y2:{ position:'right', grid:{display:false}, ticks:{color:'#10b981',font:{size:10},callback:v=>v+'M'}, border:{color:'transparent'} }
+        y2:{ position:'right', grid:{display:false}, ticks:{color:'#10b981',font:{size:10},callback:v=>fmtN(v)}, border:{color:'transparent'} }
       }
     }
   });
@@ -943,15 +1054,15 @@ function updateCharts(filtered) {
   cM = new Chart($('cMonthly'), {
     type:'bar',
     data:{
-      labels:months.map(m=>{const p=m.month.split('-');return (p[0]||'').slice(2)+'/'+(p[1]||'');}),
-      datasets:[{ data:months.map(m=>+(m.total/1e6).toFixed(1)), backgroundColor:months.map((m,i)=>m.month===selM?'rgba(16,185,129,0.7)':i===months.length-1?'rgba(99,102,241,0.6)':'rgba(99,102,241,0.3)'), borderColor:months.map(m=>m.month===selM?'#10b981':'rgba(99,102,241,0.6)'), borderWidth:1, borderRadius:4 }]
+      labels:months.map(m=>fmtMonth(m.month)),
+      datasets:[{ data:months.map(m=>m.total), backgroundColor:months.map((m,i)=>m.month===selM?'rgba(16,185,129,0.7)':i===months.length-1?'rgba(99,102,241,0.6)':'rgba(99,102,241,0.3)'), borderColor:months.map(m=>m.month===selM?'#10b981':'rgba(99,102,241,0.6)'), borderWidth:1, borderRadius:4 }]
     },
     options:{
       responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>{const m=months[ctx.dataIndex];return ` ₮${ctx.raw}M · ${m.count} гүйлгээ`;}}} },
+      plugins:{ legend:{display:false}, tooltip:{...tooltipDefaults(), callbacks:{label:ctx=>{const m=months[ctx.dataIndex];return ` ₮${fmtN(ctx.raw)} · ${m.count} гүйлгээ`;}}} },
       scales:{
         x:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},maxRotation:45}, border:{color:'transparent'} },
-        y:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},callback:v=>v+'M'}, border:{color:'transparent'} }
+        y:{ grid:{color:gridColor()}, ticks:{color:tickColor(),font:{size:10},callback:v=>fmtN(v)}, border:{color:'transparent'} }
       }
     }
   });
@@ -962,7 +1073,7 @@ function updateCharts(filtered) {
   cP = new Chart($('cProfit'), {
     type:'line',
     data:{
-      labels:pm.map(m=>{const p=m.month.split('-');return (p[0]||'').slice(2)+'/'+(p[1]||'');}),
+      labels:pm.map(m=>fmtMonth(m.month)),
       datasets:[{ data:pm.map(m=>m.count), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', borderWidth:2, pointRadius:2, pointBackgroundColor:'#3b82f6', fill:true, tension:0.4 }]
     },
     options:{
